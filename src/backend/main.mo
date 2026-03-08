@@ -5,6 +5,19 @@ import Int32 "mo:core/Int32";
 import Array "mo:core/Array";
 import Runtime "mo:core/Runtime";
 
+// Explicit migration: discard the old `initialProducts` stable variable
+(with migration =
+  func(_ : {
+    initialProducts : [{
+      id : Text;
+      name : Text;
+      price : Int32;
+      description : Text;
+      imageUrl : Text;
+      isBestseller : Bool;
+    }]
+  }) : {} { {} }
+)
 actor {
   let adminPasskey = "Twentyseven@27withThree@03";
 
@@ -23,114 +36,27 @@ actor {
     };
   };
 
+  // Persistent product list — no seeding on startup
   let productList = List.empty<Product>();
 
-  let initialProducts : [Product] = [
-    {
-      id = "1";
-      name = "Single Flower Bouquet";
-      price = Int32.fromInt(99);
-      description = "A beautiful single flower bouquet.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "2";
-      name = "Double Flower Bouquet";
-      price = Int32.fromInt(199);
-      description = "A lovely double flower bouquet.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "3";
-      name = "Triple Flower Bouquet";
-      price = Int32.fromInt(299);
-      description = "A stunning triple flower bouquet.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "4";
-      name = "Five Flower Bouquet";
-      price = Int32.fromInt(499);
-      description = "An elegant five flower bouquet.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "5";
-      name = "Seven Flower Bouquet";
-      price = Int32.fromInt(699);
-      description = "A luxurious seven flower bouquet.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "6";
-      name = "Evil Eye Pot";
-      price = Int32.fromInt(649);
-      description = "A unique evil eye pot.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "7";
-      name = "Single Sunflower";
-      price = Int32.fromInt(249);
-      description = "A bright single sunflower.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "8";
-      name = "Single Rose (various colors)";
-      price = Int32.fromInt(199);
-      description = "A classic single rose in various colors.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "9";
-      name = "Small Beautiful Pots";
-      price = Int32.fromInt(149);
-      description = "Small, beautiful pots for decoration.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-    {
-      id = "10";
-      name = "Small Sunflower";
-      price = Int32.fromInt(99);
-      description = "A adorable small sunflower.";
-      imageUrl = "";
-      isBestseller = false;
-    },
-  ];
-
-  // Add initial products to the list
-  for (product in initialProducts.values()) {
-    productList.add(product);
-  };
-
-  public query ({ caller }) func verifyPasskey(passkey : Text) : async Bool {
+  public query ({ caller = _ }) func verifyPasskey(passkey : Text) : async Bool {
     passkey == adminPasskey;
   };
 
-  public query ({ caller }) func getAllProducts() : async [Product] {
+  public query ({ caller = _ }) func getAllProducts() : async [Product] {
     productList.toArray().sort();
   };
 
-  public query ({ caller }) func getProductsByCategory(category : Text) : async [Product] {
+  public query ({ caller = _ }) func getProductsByCategory(_ : Text) : async [Product] {
     productList.toArray().sort();
   };
 
-  public shared ({ caller }) func createProduct(passkey : Text, product : Product) : async () {
+  public shared ({ caller = _ }) func createProduct(passkey : Text, product : Product) : async () {
     if (passkey != adminPasskey) { Runtime.trap("Unauthorized") };
     productList.add(product);
   };
 
-  public shared ({ caller }) func updateProduct(passkey : Text, updatedProduct : Product) : async () {
+  public shared ({ caller = _ }) func updateProduct(passkey : Text, updatedProduct : Product) : async () {
     if (passkey != adminPasskey) { Runtime.trap("Unauthorized") };
 
     let index = productList.toArray().findIndex(
@@ -150,7 +76,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func deleteProduct(passkey : Text, productId : Text) : async () {
+  public shared ({ caller = _ }) func deleteProduct(passkey : Text, productId : Text) : async () {
     if (passkey != adminPasskey) { Runtime.trap("Unauthorized") };
 
     let initialSize = productList.size();
@@ -168,7 +94,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func updateProductDescription(passkey : Text, productId : Text, newDescription : Text) : async () {
+  public shared ({ caller = _ }) func updateProductDescription(passkey : Text, productId : Text, newDescription : Text) : async () {
     if (passkey != adminPasskey) { Runtime.trap("Unauthorized") };
 
     let index = productList.toArray().findIndex(
