@@ -12,7 +12,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 99,
     description:
       "A delicate single chenille flower, handcrafted with love. Perfect for everyday gifting or as a sweet reminder that someone is thinking of you.",
-    imageUrl: "/assets/generated/product-single-bouquet.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: false,
   },
   {
@@ -21,7 +21,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 199,
     description:
       "Two beautifully paired chenille blooms in complementary hues. A charming gift for close friends and loved ones that lasts forever.",
-    imageUrl: "/assets/generated/product-double-bouquet.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: false,
   },
   {
@@ -30,7 +30,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 299,
     description:
       "Three handcrafted chenille flowers in a harmonious trio. An elegant arrangement for anniversaries, birthdays, or just because.",
-    imageUrl: "/assets/generated/product-triple-bouquet.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: false,
   },
   {
@@ -39,7 +39,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 499,
     description:
       "A lush bouquet of five chenille blooms in assorted tones. A generous and heartfelt gift that brings lasting joy to any room.",
-    imageUrl: "/assets/generated/product-five-bouquet.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: true,
   },
   {
@@ -48,7 +48,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 699,
     description:
       "Our most opulent bouquet — seven full chenille blooms in a rich palette. A statement gift for the most special occasions in life.",
-    imageUrl: "/assets/generated/product-seven-bouquet.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: true,
   },
   {
@@ -57,7 +57,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 649,
     description:
       "A charming hand-decorated pot featuring the iconic evil eye motif, adorned with soft chenille flowers. Beautiful and protective — a unique keepsake.",
-    imageUrl: "/assets/generated/product-evil-eye-pot.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: false,
   },
   {
@@ -66,7 +66,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 249,
     description:
       "A bold, cheerful chenille sunflower with golden petals and a velvety dark centre. Brings warmth and brightness to any space, forever.",
-    imageUrl: "/assets/generated/product-single-sunflower.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: false,
   },
   {
@@ -75,7 +75,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 199,
     description:
       "A classic handcrafted chenille rose available in a range of colours — blush, red, white, or mauve. Timeless romance that never wilts.",
-    imageUrl: "/assets/generated/product-single-rose.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: true,
   },
   {
@@ -84,7 +84,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 149,
     description:
       "Tiny decorative pots filled with miniature chenille flowers. Sweet, compact, and endlessly giftable — perfect for desks and windowsills.",
-    imageUrl: "/assets/generated/product-small-pot.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: false,
   },
   {
@@ -93,7 +93,7 @@ const DEFAULT_PRODUCTS: Product[] = [
     price: 99,
     description:
       "A petite version of our beloved sunflower, handcrafted with the same love and detail. Affordable, adorable, and absolutely charming.",
-    imageUrl: "/assets/generated/product-small-sunflower.dim_800x800.jpg",
+    imageUrl: "",
     isBestseller: false,
   },
 ];

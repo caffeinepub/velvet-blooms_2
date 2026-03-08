@@ -1,3 +1,4 @@
+import { ExternalBlob } from "@/blob-storage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,13 +10,14 @@ import {
   Check,
   Edit,
   Flower2,
+  ImagePlus,
   Loader2,
   LogOut,
   Plus,
   Trash2,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import type { Product } from "../backend.d";
 import {
@@ -54,6 +56,9 @@ export default function AdminDashboard({
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<Omit<Product, "id">>(EMPTY_FORM);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { mutate: createProduct, isPending: isCreating } = useCreateProduct();
   const { mutate: updateProduct, isPending: isUpdating } = useUpdateProduct();
@@ -61,10 +66,33 @@ export default function AdminDashboard({
 
   const isSaving = isCreating || isUpdating;
 
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+    setIsUploading(true);
+    setUploadProgress(0);
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const blob = ExternalBlob.fromBytes(bytes).withUploadProgress((pct) =>
+        setUploadProgress(pct),
+      );
+      await blob.getBytes();
+      const permanentUrl = blob.getDirectURL();
+      setFormData((p) => ({ ...p, imageUrl: permanentUrl }));
+      toast.success("Image uploaded successfully!");
+    } catch {
+      toast.error("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(null);
+    }
+  };
+
   const openAdd = () => {
     setFormData(EMPTY_FORM);
     setEditingProduct(null);
     setFormMode("add");
+    setUploadProgress(null);
+    setIsUploading(false);
   };
 
   const openEdit = (product: Product) => {
@@ -83,6 +111,8 @@ export default function AdminDashboard({
     setFormMode("idle");
     setEditingProduct(null);
     setFormData(EMPTY_FORM);
+    setUploadProgress(null);
+    setIsUploading(false);
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -306,25 +336,127 @@ export default function AdminDashboard({
                 />
               </div>
 
-              {/* Image URL */}
+              {/* Image Upload */}
               <div className="space-y-2">
-                <Label
-                  htmlFor="prod-img"
-                  className="font-inter text-sm font-medium"
-                >
-                  Image URL
+                <Label className="font-inter text-sm font-medium">
+                  Product Image
                 </Label>
-                <Input
-                  data-ocid="admin.product.input"
-                  id="prod-img"
-                  value={formData.imageUrl}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, imageUrl: e.target.value }))
-                  }
-                  placeholder="https://... or /assets/..."
-                  className="font-inter h-11 rounded-xl"
-                  style={{ fontSize: "16px" }}
+
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="sr-only"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                    // Reset so same file can be re-selected
+                    e.target.value = "";
+                  }}
                 />
+
+                <div className="flex gap-3 items-start">
+                  {/* Upload button / progress area */}
+                  <div className="flex-1">
+                    {isUploading ? (
+                      <div
+                        data-ocid="admin.product.loading_state"
+                        className="flex items-center gap-3 h-11 px-4 rounded-xl border"
+                        style={{
+                          background: "oklch(0.975 0.008 75)",
+                          borderColor: "oklch(0.88 0.012 70)",
+                        }}
+                      >
+                        <Loader2
+                          size={15}
+                          className="animate-spin flex-shrink-0"
+                          style={{ color: "oklch(0.58 0.085 10)" }}
+                        />
+                        <div className="flex-1">
+                          <div className="flex justify-between mb-1">
+                            <span
+                              className="font-inter text-xs"
+                              style={{ color: "oklch(0.52 0.085 10)" }}
+                            >
+                              Uploading...
+                            </span>
+                            <span
+                              className="font-inter text-xs font-semibold"
+                              style={{ color: "oklch(0.52 0.085 10)" }}
+                            >
+                              {uploadProgress ?? 0}%
+                            </span>
+                          </div>
+                          <div
+                            className="h-1.5 rounded-full overflow-hidden"
+                            style={{ background: "oklch(0.88 0.012 70)" }}
+                          >
+                            <div
+                              className="h-full rounded-full transition-all duration-300"
+                              style={{
+                                width: `${uploadProgress ?? 0}%`,
+                                background: "oklch(0.58 0.085 10)",
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        data-ocid="admin.product.upload_button"
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="font-inter h-11 w-full rounded-xl gap-2 text-sm justify-start"
+                        style={{
+                          borderStyle: formData.imageUrl ? "solid" : "dashed",
+                          borderColor: formData.imageUrl
+                            ? "oklch(0.88 0.012 70)"
+                            : "oklch(0.72 0.045 10)",
+                          color: formData.imageUrl
+                            ? "oklch(0.4 0.02 60)"
+                            : "oklch(0.52 0.085 10)",
+                        }}
+                      >
+                        <ImagePlus size={15} className="flex-shrink-0" />
+                        {formData.imageUrl ? "Replace Image" : "Upload Image"}
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Image preview thumbnail */}
+                  {formData.imageUrl && !isUploading && (
+                    <div
+                      className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0 border"
+                      style={{ borderColor: "oklch(0.88 0.012 70)" }}
+                    >
+                      <img
+                        src={formData.imageUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData((p) => ({ ...p, imageUrl: "" }))
+                        }
+                        className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center rounded-bl-lg"
+                        style={{
+                          background: "oklch(0.577 0.245 27.325)",
+                          color: "white",
+                        }}
+                        title="Remove image"
+                      >
+                        <X size={9} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <p className="font-inter text-xs text-muted-foreground">
+                  Accepts JPG, PNG, or WebP. Images are stored permanently.
+                </p>
               </div>
 
               {/* Bestseller */}
